@@ -7,20 +7,16 @@ interface Project {
 
 const projectsData: Project[] = [
   {
-    title: 'A Search Engine',
-    description: `What if you could look up any information in the world? Webpages, images, videos
-    and more. Google has many features to help you find exactly what you're looking
-    for.`,
-    imgSrc: '/static/images/google.png',
-    href: 'https://www.google.com',
+    title: '掛單交易系統-後台',
+    description: `掛單交易系統是專門為金融市場設計的系統，可以幫助交易者快速掛單，並且可以幫助交易者快速撤單。`,
+    imgSrc: '/static/images/passon-wallet-logo.png',
+    href: 'https://token-admin-web.passon.tw/login',
   },
   {
-    title: 'The Time Machine',
-    description: `Imagine being able to travel back in time or to the future. Simple turn the knob
-    to the desired date and press "Go". No more worrying about lost keys or
-    forgotten headphones with this simple yet affordable solution.`,
-    imgSrc: '/static/images/time-machine.jpg',
-    href: '/blog/the-time-machine',
+    title: 'Passon TW POS Service',
+    description: `Passon TW POS Service 是專門為零售業者設計的POS系統，可以幫助零售業者快速結帳，並且可以幫助零售業者快速管理庫存。`,
+    imgSrc: '/static/images/passon-tw-pos-service.png',
+    href: 'https://pos-backend-web.passon.tw/login',
   },
 ]
 

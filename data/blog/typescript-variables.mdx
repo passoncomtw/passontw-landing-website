@@ -1,0 +1,392 @@
+---
+title: TypeScript 變數入門：種類與使用方式
+date: '2025-10-01'
+tags: ['typescript']
+draft: false
+summary: 這篇文章帶你快速了解 TypeScript 中變數的宣告方式、常見型別與使用情境。
+---
+
+## 變數宣告關鍵字：const、let 與 var 的詳細比較
+
+### const（常數）
+
+**特性：**
+- 宣告後無法重新指定（immutable binding）
+- 區塊作用域（block scope）
+- 不會提升（no hoisting）
+- 不可重複宣告
+- 必須在宣告時初始化
+
+**優點：**
+- 防止意外覆寫，提升程式碼安全性
+- 明確表達「這個值不應該改變」的意圖
+- 現代 JavaScript/TypeScript 的推薦做法
+
+**缺點：**
+- 無法重新賦值（但物件或陣列的內容仍可修改）
+
+```typescript
+const siteName: string = 'PassonTW'
+// siteName = 'NewName' // ❌ 錯誤：無法重新指定
+
+const config = { theme: 'dark' }
+config.theme = 'light' // ✅ 可以：修改物件內容
+// config = {} // ❌ 錯誤：無法重新指定整個物件
+```
+
+### let（可變變數）
+
+**特性：**
+- 可以重新指定
+- 區塊作用域（block scope）
+- 不會提升（但會進入「暫時性死區」TDZ）
+- 不可在同一作用域重複宣告
+- 不需要在宣告時初始化
+
+**優點：**
+- 適合需要更新的變數
+- 作用域清晰，避免變數洩漏
+- 現代 JavaScript/TypeScript 的推薦做法
+
+**缺點：**
+- 可能被意外覆寫（需要開發者自己注意）
+
+```typescript
+let visitorCount: number = 0
+visitorCount = 1 // ✅ 可以重新指定
+
+if (true) {
+  let localVar = '只在這個區塊內有效'
+}
+// console.log(localVar) // ❌ 錯誤：無法存取區塊外的變數
+```
+
+### var（舊式宣告）
+
+**特性：**
+- 可以重新指定
+- 函式作用域（function scope）或全域作用域
+- 會提升（hoisting）到作用域頂部
+- 可以重複宣告（會覆蓋前一個）
+- 不需要在宣告時初始化
+
+**缺點：**
+- 作用域過大，容易造成變數洩漏
+- 提升行為容易造成混淆
+- 可以重複宣告，容易產生 bug
+- 不支援區塊作用域
+
+**優點：**
+- 無（在現代開發中已不推薦使用）
+
+```typescript
+function example() {
+  if (true) {
+    var oldStyle = 'var 變數'
+  }
+  console.log(oldStyle) // ✅ 可以存取：因為 var 是函式作用域
+}
+
+// 提升（hoisting）範例
+console.log(hoistedVar) // undefined（不會報錯，但值是 undefined）
+var hoistedVar = '我被提升了'
+
+// 重複宣告
+var x = 1
+var x = 2 // ✅ 不會報錯（但容易造成混淆）
+```
+
+### 比較表格
+
+| 特性 | const | let | var |
+|------|-------|-----|-----|
+| 重新指定 | ❌ | ✅ | ✅ |
+| 作用域 | 區塊 | 區塊 | 函式/全域 |
+| 提升 | ❌ | ❌ (TDZ) | ✅ |
+| 重複宣告 | ❌ | ❌ | ✅ |
+| 初始化要求 | ✅ 必須 | ❌ 可選 | ❌ 可選 |
+| 現代推薦 | ✅ 優先 | ✅ 優先 | ❌ 避免 |
+
+### 使用建議
+
+1. **優先使用 `const`**：除非確定需要重新指定，否則一律使用 `const`
+2. **需要更新時用 `let`**：例如迴圈計數器、狀態變數
+3. **避免使用 `var`**：除非維護舊專案，否則不要使用
+
+```typescript
+// ✅ 推薦寫法
+const API_URL = 'https://api.example.com' // 常數用 const
+let currentPage = 1 // 會變動的用 let
+
+// ❌ 不推薦
+var oldVariable = '避免使用 var'
+```
+
+## 常見基礎型別
+
+- `string`：字串
+- `number`：數字（整數、浮點數）
+- `boolean`：布林值
+- `null` / `undefined`：空值與未定義
+- `any`：任意型別，會放棄型別檢查（初學者慎用）
+- `unknown`：未知型別，使用前需要縮小型別（較安全）
+
+```typescript
+const title: string = '變數教學'
+const price: number = 199
+const isPublished: boolean = true
+let optionalValue: string | null = null
+let anything: any = '可以是任何型別'
+let maybe: unknown = '需要縮小型別'
+```
+
+## 進階常用型別
+
+- **陣列**：`string[]`、`Array<number>`
+- **物件**：以介面或型別別名描述結構
+- **聯集型別**：`string | number`
+- **字面值型別**：限制為特定值，例如 `'success' | 'error'`
+- **元組**：固定長度與順序，例如 `[string, number]`
+
+```typescript
+const tags: string[] = ['typescript', 'variables']
+
+type ArticleMeta = {
+  title: string
+  views: number
+  status: 'draft' | 'published'
+}
+
+const article: ArticleMeta = {
+  title: 'TypeScript 變數入門',
+  views: 10,
+  status: 'draft',
+}
+
+const point: [number, number] = [10, 20]
+```
+
+## 型別推論與顯式註記
+
+TypeScript 會嘗試推論型別，但關鍵變數（例如 API 回傳、函式參數）建議加上顯式型別以提升可讀性與安全性。
+
+```typescript
+// 推論：greeting 被推論為 string
+const greeting = 'Hello'
+
+// 顯式註記：避免推論成 any
+function add(a: number, b: number): number {
+  return a + b
+}
+```
+
+## TypeScript 如何解決 JavaScript 的 undefined、null、NaN 問題
+
+JavaScript 中的 `undefined`、`null` 和 `NaN` 是常見的錯誤來源。TypeScript 透過型別系統幫助開發者在編譯時期就發現這些問題。
+
+### 問題 1：undefined 的處理
+
+**JavaScript 的問題：**
+```javascript
+function getUserName(user) {
+  return user.name // 如果 user 是 undefined，會拋出錯誤
+}
+
+const name = getUserName() // 執行時才會發現錯誤
+```
+
+**TypeScript 的解決方案：**
+```typescript
+// 1. 明確標註可能為 undefined
+function getUserName(user: { name: string } | undefined): string | undefined {
+  if (user === undefined) {
+    return undefined
+  }
+  return user.name
+}
+
+// 2. 使用可選鏈（Optional Chaining）
+type User = {
+  name?: string // 可選屬性
+}
+
+function getUserName(user: User | undefined): string | undefined {
+  return user?.name // 安全存取，如果 user 是 undefined 則返回 undefined
+}
+
+// 3. 使用非空斷言（謹慎使用）
+function getUserNameSafe(user: User | undefined): string {
+  return user!.name // 告訴 TypeScript 確定 user 不是 undefined
+}
+```
+
+### 問題 2：null 的處理
+
+**JavaScript 的問題：**
+```javascript
+function parseNumber(str) {
+  const num = parseInt(str)
+  return num * 2 // 如果 parseInt 失敗返回 NaN，計算結果也是 NaN
+}
+```
+
+**TypeScript 的解決方案：**
+```typescript
+// 1. 明確處理 null 的情況
+function parseNumber(str: string | null): number | null {
+  if (str === null) {
+    return null
+  }
+  const num = parseInt(str, 10)
+  return isNaN(num) ? null : num * 2
+}
+
+// 2. 使用聯合型別明確表達可能的值
+type Result = number | null
+
+function safeParse(str: string): Result {
+  const num = parseInt(str, 10)
+  return isNaN(num) ? null : num
+}
+
+// 3. 使用型別守衛（Type Guard）
+function isNumber(value: unknown): value is number {
+  return typeof value === 'number' && !isNaN(value)
+}
+
+function processValue(value: unknown): number {
+  if (isNumber(value)) {
+    return value * 2 // TypeScript 知道這裡 value 是 number
+  }
+  throw new Error('Invalid number')
+}
+```
+
+### 問題 3：NaN 的處理
+
+**JavaScript 的問題：**
+```javascript
+function calculate(a, b) {
+  return a + b // 如果 a 或 b 不是數字，可能返回 NaN
+}
+
+const result = calculate('hello', 5) // 返回 'hello5'（字串拼接）
+const result2 = calculate(undefined, 5) // 返回 NaN
+```
+
+**TypeScript 的解決方案：**
+```typescript
+// 1. 嚴格型別檢查
+function calculate(a: number, b: number): number {
+  if (isNaN(a) || isNaN(b)) {
+    throw new Error('Invalid number')
+  }
+  return a + b
+}
+
+// 2. 使用型別守衛確保數值有效
+function isValidNumber(value: unknown): value is number {
+  return typeof value === 'number' && !isNaN(value) && isFinite(value)
+}
+
+function safeCalculate(a: unknown, b: unknown): number {
+  if (!isValidNumber(a) || !isValidNumber(b)) {
+    throw new Error('Both arguments must be valid numbers')
+  }
+  return a + b // TypeScript 知道 a 和 b 都是有效的 number
+}
+
+// 3. 使用嚴格模式與編譯選項
+// tsconfig.json
+// {
+//   "compilerOptions": {
+//     "strict": true,           // 啟用所有嚴格檢查
+//     "strictNullChecks": true, // 嚴格 null 檢查
+//     "noImplicitAny": true     // 禁止隱式 any
+//   }
+// }
+```
+
+### 實用模式與最佳實踐
+
+```typescript
+// 1. 使用可選屬性與預設值
+type Config = {
+  apiUrl?: string
+  timeout?: number
+}
+
+function createConfig(config: Config = {}): Required<Config> {
+  return {
+    apiUrl: config.apiUrl ?? 'https://api.default.com',
+    timeout: config.timeout ?? 5000,
+  }
+}
+
+// 2. 使用空值合併運算子（Nullish Coalescing）
+function getValue(value: string | null | undefined): string {
+  return value ?? 'default' // 只有 null 或 undefined 時才使用預設值
+}
+
+// 3. 明確的錯誤處理
+type Result<T, E = Error> = 
+  | { success: true; data: T }
+  | { success: false; error: E }
+
+function safeDivide(a: number, b: number): Result<number> {
+  if (b === 0) {
+    return { success: false, error: new Error('Division by zero') }
+  }
+  if (isNaN(a) || isNaN(b)) {
+    return { success: false, error: new Error('Invalid number') }
+  }
+  return { success: true, data: a / b }
+}
+
+// 使用範例
+const result = safeDivide(10, 2)
+if (result.success) {
+  console.log(result.data) // TypeScript 知道這裡 data 存在
+} else {
+  console.error(result.error) // TypeScript 知道這裡 error 存在
+}
+```
+
+### 編譯選項建議
+
+在 `tsconfig.json` 中啟用嚴格檢查：
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true
+  }
+}
+```
+
+這些設定會讓 TypeScript 在編譯時期就發現 `undefined`、`null` 和 `NaN` 相關的問題，大幅減少執行時期的錯誤。
+
+## Hello World：綜合小範例
+
+```typescript
+// hello-world.ts
+const appName: string = 'PassonTW Blog'
+let visitCount: number = 1
+const isDarkModeEnabled: boolean = true
+
+function greet(user: string): string {
+  return `Hello, ${user}! 歡迎來到 ${appName}.`
+}
+
+console.log(greet('TypeScript 初學者'))
+console.log(`目前瀏覽次數：${visitCount}`)
+console.log(`深色模式啟用：${isDarkModeEnabled}`)
+```
+
+這樣就完成了！透過以上內容，你已經了解 TypeScript 變數的宣告方式、常見型別以及簡單的實戰範例。試著在自己的專案套用這些技巧，逐步累積類型安全的程式碼吧。
+
